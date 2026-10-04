@@ -130,3 +130,11 @@ streamlit>=1.30.0
 - **Machine Learning:** Scikit-Learn (`cosine_similarity`)
 - **Persistence:** Pickle
 - **Frontend / Deployment:** Streamlit
+
+## 👥 Contributors
+
+- **Najeeb Ahmed** - *Machine Learning & Pipeline Development*
+  - GitHub: [@your-username](https://github.com/your-username)
+  - LinkedIn: [Najeeb Ahmed](https://linkedin.com/in/your-profile)
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](../../issues).
