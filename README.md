@@ -133,8 +133,8 @@ streamlit>=1.30.0
 
 ## 👥 Contributors
 
-- **Najeeb Ahmed** - *Machine Learning & Pipeline Development*
-  - GitHub: [@your-username](https://github.com/your-username)
-  - LinkedIn: [Najeeb Ahmed](https://linkedin.com/in/your-profile)
+- **Najeeb Ahmed** - *Machine Learning & Artificial Intelligence Engineer*
+  - GitHub: [Najeeb Ahmed](https://github.com/NajeebAhmed69)
+  - LinkedIn: [Najeeb Ahmed](www.linkedin.com/in/najeeb-ahmed-346110262)
 
 Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](../../issues).
