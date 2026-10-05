@@ -82,41 +82,52 @@ print("\nPOPULAR BOOKS")
 print(popular_df.head())
 
 # COLLABORATIVE FILTERING
-# Find users who have rated more than 200 books
 
+# Find users who have rated more than 50 books
 x = (
     ratings_with_name
     .groupby('User-ID')
     .count()['Book-Rating']
-    > 200
+    > 50
 )
-# well_read_users = x[x == True].index
-well_read_users = x[x].index
 
-# Keep only these users
+# Store IDs of active users
+active_users = x[x].index
 
+print("Users with > 50 ratings:", len(active_users))
+
+# Keep only ratings given by active users
 filtered_rating = ratings_with_name[
-    ratings_with_name['User-ID'].isin(well_read_users)
+    ratings_with_name['User-ID'].isin(active_users)
 ]
 
-# FIND POPULAR BOOKS AMONG THESE USERS
+print("Rows after filtering active users:", len(filtered_rating))
 
+
+# Find books rated by at least 10 active users
 y = (
     filtered_rating
     .groupby('Book-Title')
     .count()['Book-Rating']
-    >= 50
+    >= 10
 )
 
+# Store titles of famous/popular books
 famous_books = y[y].index
 
-# Keep only famous books
+print(
+    "Books with >= 10 ratings from active users:",
+    len(famous_books)
+)
 
+# Keep ratings only for famous books
 final_ratings = filtered_rating[
     filtered_rating['Book-Title'].isin(famous_books)
 ]
 
-# CREATE USER-BOOK MATRIX
+print("Rows in final_ratings:", len(final_ratings))
+
+# CREATE BOOK-USER MATRIX
 
 pt = final_ratings.pivot_table(
     index='Book-Title',
@@ -125,68 +136,123 @@ pt = final_ratings.pivot_table(
 )
 
 # Replace missing ratings with 0
-
 pt.fillna(0, inplace=True)
-print("\nPIVOT TABLE")
+
+print("\nPIVOT TABLE SHAPE:")
+print(pt.shape)
+
+print("\nPIVOT TABLE:")
 print(pt.head())
 
-# CALCULATE COSINE SIMILARITY
 
-similarity_scores = cosine_similarity(pt)
-print("\nSimilarity matrix shape:")
-print(similarity_scores.shape)
+# Check whether the pivot table has data
+if pt.empty:
+    print(
+        "\nPivot table is empty."
+        "\nReduce the filtering values."
+    )
 
-# RECOMMENDATION FUNCTION
+else:
+    # CALCULATE COSINE SIMILARITY
+    similarity_scores = cosine_similarity(pt)
 
-def recommend(book_name):
-    
-    # Check if book exists
-    
-    if book_name not in pt.index:
-        print("Book not found in recommendation system.")
-        return
-    
-    # Find index of selected book
-    
-    index = np.where(pt.index == book_name)[0][0]
-    
-    # Get similarity scores
-    
-    similar_books = sorted(
-        list(enumerate(similarity_scores[index])),
-        key=lambda x: x[1],
-        reverse=True
-   )[1:6]
-    
-    print(f"\nRecommendations for: {book_name}\n")
-    
-    for i in similar_books:
-        book_index = i[0]
-        recommended_book = pt.index[book_index]
-        print(recommended_book)
+    print("\nSimilarity matrix shape:")
+    print(similarity_scores.shape)
 
-# TEST RECOMMENDATION
-recommend('1984')
+   # RECOMMENDATION FUNCTION
+    def recommend(book_name):
 
-# SAVE DATA
-pickle.dump(
-    popular_df,
-    open('popular.pkl', 'wb')
-)
+        # Remove extra spaces from user input
+        book_name = book_name.strip()
 
-pickle.dump(
-    pt.index,
-    open('book_names.pkl', 'wb')
-)
+        # Check whether the selected book exists
+        if book_name not in pt.index:
+            print("\nBook not found in recommendation system.")
 
-pickle.dump(
-    similarity_scores,
-    open('similarity_scores.pkl', 'wb')
-)
+            # Find titles containing the entered text
+            matching_books = [
+                title
+                for title in pt.index
+                if book_name.lower() in title.lower()
+            ]
 
-pickle.dump(
-    books,
-    open('books.pkl', 'wb')
-)
+            # Print possible title matches
+            if matching_books:
+                print("\nPossible matching books:")
 
-print("\nFiles saved successfully!")
+                for title in matching_books[:10]:
+                    print(title)
+
+            return
+
+        # Find index of selected book
+        index = np.where(pt.index == book_name)[0][0]
+
+        # Find five most similar books
+        similar_books = sorted(
+            list(enumerate(similarity_scores[index])),
+            key=lambda x: x[1],
+            reverse=True
+        )[1:6]
+
+        print(f"\nRecommendations for: {book_name}\n")
+
+        # Print each recommended book
+        for i in similar_books:
+            book_index = i[0]
+            similarity_score = i[1]
+
+            recommended_book = pt.index[book_index]
+
+            print(
+                recommended_book,
+                "- Similarity Score:",
+                round(similarity_score, 3)
+            )
+            
+    # SEARCH FOR A BOOK TITLE
+    search_text = '16 Lighthouse Road'
+
+    matching_books = [
+        title
+        for title in pt.index
+        if search_text.lower() in title.lower()
+    ]
+
+    print(f"\nPossible matches for '{search_text}':")
+
+    if len(matching_books) > 0:
+        for title in matching_books:
+            print(title)
+    else:
+        print("No matching book found.")
+
+
+    # TEST RECOMMENDATION SYSTEM
+
+    recommend('16 Lighthouse Road')
+
+
+    # SAVE FILES
+
+    pickle.dump(
+        popular_df,
+        open('popular.pkl', 'wb')
+    )
+
+    pickle.dump(
+        pt.index,
+        open('book_names.pkl', 'wb')
+    )
+
+    pickle.dump(
+        similarity_scores,
+        open('similarity_scores.pkl', 'wb')
+    )
+
+    pickle.dump(
+        books,
+        open('books.pkl', 'wb')
+    )
+
+    print("\nFiles saved successfully!")
