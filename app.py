@@ -98,10 +98,10 @@ def get_recommendations(selected_book_title):
 
     return recommendation_cards
 
-st.title("📚 Book Recommender System")
+st.title("Book Recommender System")
 st.caption("Powered by Collaborative Filtering (Cosine Similarity) & Popularity Metrics")
 
-tab1, tab2 = st.tabs(["🔍 Personalized Recommendations", "⭐ Top 50 Popular Books"])
+tab1, tab2 = st.tabs(["Personalized Recommendations", "Top 50 Popular Books"])
 
 with tab1:
     st.subheader("Recommend by Book Title")
@@ -126,7 +126,7 @@ with tab1:
                     img_src = recs[i]['image'] if str(recs[i]['image']).startswith('http') else "https://via.placeholder.com/150x220?text=No+Cover"
                     st.image(img_src, use_container_width=True)
                     st.markdown(f"**{recs[i]['title']}**")
-                    st.caption(f"✍️ {recs[i]['author']}")
+                    st.caption(f"{recs[i]['author']}")
                     st.success(f"Similarity: {recs[i]['match']}")
         else:
             st.warning("No recommendations available for the selected title.")
@@ -147,5 +147,5 @@ with tab2:
                     img_src = item['Image-URL-M'] if str(item['Image-URL-M']).startswith('http') else "https://via.placeholder.com/150x220?text=No+Cover"
                     st.image(img_src, use_container_width=True)
                     st.markdown(f"**{item['Book-Title']}**")
-                    st.caption(f"✍️ {item['Book-Author']}")
-                    st.info(f"⭐ {item['avg_ratings']:.2f} ({int(item['num_ratings'])} votes)")
+                    st.caption(f"{item['Book-Author']}")
+                    st.info(f"{item['avg_ratings']:.2f} ({int(item['num_ratings'])} votes)")
